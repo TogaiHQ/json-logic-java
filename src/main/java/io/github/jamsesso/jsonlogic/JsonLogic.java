@@ -61,6 +61,7 @@ public final class JsonLogic {
     addOperation(DateConversionExpression.INSTANCE);
     addOperation(DateArithmeticExpression.DATE_ADD);
     addOperation(DateArithmeticExpression.DATE_SUBTRACT);
+    addOperation(DurationArithmeticExpression.DURATION_BETWEEN);
   }
 
   public JsonLogic addOperation(String name, Function<Object[], Object> function) {

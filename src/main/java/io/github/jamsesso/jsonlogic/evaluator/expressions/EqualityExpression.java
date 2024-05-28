@@ -125,7 +125,7 @@ public class EqualityExpression implements PreEvaluatedArgumentsExpression {
 
   private boolean compareDateToString(OffsetDateTime left, String right) {
     try {
-      return DateOperations.equals(left, DateOperations.fromString(right.trim()));
+      return DateOperations.equals(left, DateOperations.fromDateString(right.trim()));
     }
     catch (DateTimeParseException e) {
       return false;

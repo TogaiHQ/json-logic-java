@@ -3,7 +3,6 @@ package io.github.jamsesso.jsonlogic.evaluator.expressions;
 import io.github.jamsesso.jsonlogic.evaluator.JsonLogicEvaluationException;
 import io.github.jamsesso.jsonlogic.utils.DateOperations;
 
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class DateConversionExpression implements PreEvaluatedArgumentsExpression
         Object value = arguments.get(0);
         if (value instanceof String) {
             try {
-                return DateOperations.fromString((String) value);
+                return DateOperations.fromDateString((String) value);
             }
             catch (DateTimeParseException e) {
                 throw new JsonLogicEvaluationException(e);

@@ -1,21 +1,18 @@
 package io.github.jamsesso.jsonlogic.evaluator.expressions;
 
 import io.github.jamsesso.jsonlogic.evaluator.JsonLogicEvaluationException;
-import io.github.jamsesso.jsonlogic.utils.BigDecimalOperations;
 import io.github.jamsesso.jsonlogic.utils.DateOperations;
 
+import javax.xml.datatype.Duration;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 
 public class DateArithmeticExpression implements PreEvaluatedArgumentsExpression {
-  public static final DateArithmeticExpression DATE_ADD = new DateArithmeticExpression("+");
-  public static final DateArithmeticExpression DATE_SUBTRACT = new DateArithmeticExpression("-");
+  public static final DateArithmeticExpression DATE_ADD = new DateArithmeticExpression("date_add");
+  public static final DateArithmeticExpression DATE_SUBTRACT = new DateArithmeticExpression("date_sub");
 
   private final String key;
 
@@ -34,29 +31,37 @@ public class DateArithmeticExpression implements PreEvaluatedArgumentsExpression
       return null;
     }
 
-    if (arguments.size() == 3) {
-      try {
-        OffsetDateTime date = DateOperations.fromString((String) arguments.get(0));
+    /*
+     * --- Supported Operations ---
+     * DATE_ADD("date_add"):
+     *    1. [date, intervalToAdd, intervalUnit]
+     *    2. [date, duration ISO8601]
+     * DATE_SUB("date_sub"):
+     *    1. [date, intervalToSubtract, intervalUnit]
+     *    2. [date, duration ISO8601]
+     *
+     * NOTE: Returns OffsetDateTime
+     */
+
+    try {
+      OffsetDateTime date = DateOperations.fromDateString((String) arguments.get(0));
+      if (arguments.size() == 3) {
         BigDecimal intervalToAdd = (BigDecimal) arguments.get(1);
         ChronoUnit interval = ChronoUnit.valueOf((String) arguments.get(2));
 
-        return Objects.equals(key, "+")
+        return Objects.equals(key, "date_add")
                 ? date.plus(Long.parseLong(intervalToAdd.toString()), interval)
                 : date.minus(Long.parseLong(intervalToAdd.toString()), interval);
-      } catch (DateTimeParseException | IllegalArgumentException | ClassCastException e) {
-        return null;
-      }
-    } else if (arguments.size() == 2 && Objects.equals(key, "-")) {
-      try {
-        OffsetDateTime date1 = DateOperations.fromString((String) arguments.get(0));
-        OffsetDateTime date2 = DateOperations.fromString((String) arguments.get(1));
+      } else if (arguments.size() == 2) {
+        Duration duration = DateOperations.fromDurationString((String) arguments.get(1));
 
-        return Duration.between(date1, date2).toDays();
-      } catch (DateTimeParseException e) {
-        return null;
+        return Objects.equals(key, "date_add")
+                ? DateOperations.addDurationToDate(date, duration).toString()
+                : DateOperations.subtractDurationToDate(date, duration).toString();
       }
-    } else {
-      throw new JsonLogicEvaluationException("date arithmetic requires 2 or 3 arguments");
+    } catch (Exception e) {
+      return null;
     }
+    throw new JsonLogicEvaluationException("date arithmetic requires 2 or 3 arguments");
   }
 }

@@ -57,7 +57,12 @@ public class DurationArithmeticExpression implements PreEvaluatedArgumentsExpres
         OffsetDateTime end = DateOperations.fromDateString((String) arguments.get(1));
         return Duration.between(start, end).toString();
       } else if (Objects.equals(key, "duration.of")) {
-        BigDecimal intervalToAdd = (BigDecimal) arguments.get(0);
+        BigDecimal intervalToAdd;
+        if (arguments.get(0) instanceof Number) {
+          intervalToAdd = (BigDecimal) arguments.get(0);
+        } else {
+          intervalToAdd = new BigDecimal((String) arguments.get(0));
+        }
         ChronoUnit intervalUnit = ChronoUnit.valueOf((String) arguments.get(1));
         return Duration.of(Long.parseLong(intervalToAdd.toString()), intervalUnit).toString();
       } else {

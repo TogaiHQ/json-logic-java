@@ -6,11 +6,21 @@ import javax.xml.datatype.Duration;
 import java.time.OffsetDateTime;
 
 public class DateOperations {
+    private static final DatatypeFactory dataTypeFactory;
+
+    static {
+        try {
+            dataTypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static OffsetDateTime fromDateString(String date) {
         return OffsetDateTime.parse(date);
     }
-    public static Duration fromDurationString(String date) throws DatatypeConfigurationException {
-        return DatatypeFactory.newInstance().newDuration(date);
+    public static Duration fromDurationString(String date) {
+        return dataTypeFactory.newDuration(date);
     }
 
     public static boolean equals(OffsetDateTime a, OffsetDateTime b) {

@@ -38,14 +38,14 @@ public class DurationArithmeticExpression implements PreEvaluatedArgumentsExpres
 
     /*
      * --- Supported Operations ---
-     * DURATION_OF ("duration_of")
+     * DURATION_OF ("duration.of")
      *    1. [intervalToAdd, intervalUnit]
-     * DURATION_BETWEEN ("duration_between")
+     * DURATION_BETWEEN ("duration.between")
      *    1. [Date, Date]
      *
      * RETURNS: Duration as String
      *
-     * DURATION_AS
+     * DURATION_AS ("duration.as")
      *    1. [Duration, intervalUnit]
      *
      * RETURNS: interval as NUMBER (BigDecimal)
@@ -66,7 +66,6 @@ public class DurationArithmeticExpression implements PreEvaluatedArgumentsExpres
         ChronoUnit intervalUnit = ChronoUnit.valueOf((String) arguments.get(1));
         return Duration.of(Long.parseLong(intervalToAdd.toString()), intervalUnit).toString();
       } else {
-//        key == duration.as
         Duration duration = Duration.parse((String) arguments.get(0));
         ChronoUnit intervalUnit = ChronoUnit.valueOf((String) arguments.get(1));
         switch (intervalUnit) {

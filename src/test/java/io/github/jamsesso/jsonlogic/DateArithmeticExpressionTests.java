@@ -14,112 +14,22 @@ public class DateArithmeticExpressionTests {
     private static final JsonLogic jsonLogic = new JsonLogic();
 
     @Test
-    public void addSeconds() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToAdd = 1L;
-        assertEquals(
-                date.plusSeconds(intervalToAdd),
-                jsonLogic.apply("{\"date_add\": [\"" + date + "\", 1, \"SECONDS\"]}", null)
-        );
-    }
-
-    @Test
-    public void addMinutes() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToAdd = 1L;
-        assertEquals(
-                date.plusMinutes(intervalToAdd),
-                jsonLogic.apply("{\"date_add\": [\"" + date + "\", 1, \"MINUTES\"]}", null)
-        );
-    }
-
-    @Test
-    public void addDays() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToAdd = 1L;
-        assertEquals(
-                date.plusDays(intervalToAdd),
-                jsonLogic.apply("{\"date_add\": [\"" + date + "\", 1, \"DAYS\"]}", null)
-        );
-    }
-
-    @Test
-    public void addMonths() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToAdd = 1L;
-        assertEquals(
-                date.plusMonths(intervalToAdd),
-                jsonLogic.apply("{\"date_add\": [\"" + date + "\", 1, \"MONTHS\"]}", null)
-        );
-    }
-
-    @Test
-    public void addYears() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToAdd = 1L;
-        assertEquals(
-                date.plusYears(intervalToAdd),
-                jsonLogic.apply("{\"date_add\": [\"" + date + "\", 1, \"YEARS\"]}", null)
-        );
-    }
-
-    @Test
-    public void subtractSeconds() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToSubtract = 1L;
-        assertEquals(
-                date.minusSeconds(intervalToSubtract),
-                jsonLogic.apply("{\"date_sub\": [\"" + date + "\", 1, \"SECONDS\"]}", null)
-        );
-    }
-
-    @Test
-    public void subtractMinutes() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToSubtract = 1L;
-        assertEquals(
-                date.minusMinutes(intervalToSubtract),
-                jsonLogic.apply("{\"date_sub\": [\"" + date + "\", 1, \"MINUTES\"]}", null)
-        );
-    }
-
-    @Test
-    public void subtractDays() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToSubtract = 1L;
-        assertEquals(
-                date.minusDays(intervalToSubtract),
-                jsonLogic.apply("{\"date_sub\": [\"" + date + "\", 1, \"DAYS\"]}", null)
-        );
-    }
-
-    @Test
-    public void subtractMonths() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToSubtract = 1L;
-        assertEquals(
-                date.minusMonths(intervalToSubtract),
-                jsonLogic.apply("{\"date_sub\": [\"" + date + "\", 1, \"MONTHS\"]}", null)
-        );
-    }
-
-    @Test
-    public void subtractYears() throws JsonLogicException {
-        OffsetDateTime date = OffsetDateTime.now();
-        long intervalToSubtract = 1L;
-        assertEquals(
-                date.minusYears(intervalToSubtract),
-                jsonLogic.apply("{\"date_sub\": [\"" + date + "\", 1, \"YEARS\"]}", null)
-        );
-    }
-
-    @Test
     public void addDurationToDate() throws JsonLogicException {
         OffsetDateTime from = LocalDate.now().atStartOfDay().atOffset(ZoneOffset.UTC);
         Duration duration = Duration.ofDays(100L);
         assertEquals(
                 LocalDate.now().atStartOfDay().plusDays(100L).atOffset(ZoneOffset.UTC).toString(),
-                jsonLogic.apply("{\"date_add\": [\"" + from + "\", \"" + duration + "\"]}", null)
+                jsonLogic.apply("{\"date.add\": [\"" + from + "\", \"" + duration + "\"]}", null)
+        );
+    }
+
+    @Test
+    public void subtractDurationToDate() throws JsonLogicException {
+        OffsetDateTime from = LocalDate.now().atStartOfDay().atOffset(ZoneOffset.UTC);
+        Duration duration = Duration.ofDays(100L);
+        assertEquals(
+                LocalDate.now().atStartOfDay().minusDays(100L).atOffset(ZoneOffset.UTC).toString(),
+                jsonLogic.apply("{\"date.sub\": [\"" + from + "\", \"" + duration + "\"]}", null)
         );
     }
 
@@ -127,17 +37,23 @@ public class DateArithmeticExpressionTests {
     @Test
     public void invalidNumberOfArguments() {
         try {
-            jsonLogic.apply("{\"date_add\": [\"2024-05-28T00:00:00Z\"]}", null);
+            jsonLogic.apply("{\"date.add\": [\"2024-05-28T00:00:00Z\"]}", null);
         } catch (JsonLogicException e) {
             assertTrue(e instanceof JsonLogicEvaluationException);
-            assertEquals(e.getMessage(), "date arithmetic requires 2 or 3 arguments");
+            assertEquals(e.getMessage(), "date arithmetic requires 2 arguments");
         }
     }
 
 //    Invalid Data Type of Arguments returns null
     @Test
-    public void invalidDataTypeForArgument() throws JsonLogicException {
+    public void invalidDateString() throws JsonLogicException {
+        Duration duration = Duration.ofDays(100L);
+        assertNull(jsonLogic.apply("{\"date.add\": [\"2024-05-28T\", \"" + duration + "\"]}", null));
+    }
+
+    @Test
+    public void invalidDurationString() throws JsonLogicException {
         OffsetDateTime date = OffsetDateTime.now();
-        assertNull(jsonLogic.apply("{\"date_add\": [\"" + date + "\", \"1\", \"SECONDS\"]}", null));
+        assertNull(jsonLogic.apply("{\"date.add\": [\"" + date + "\", \"P1111\"]}", null));
     }
 }

@@ -3,12 +3,17 @@ package io.github.jamsesso.jsonlogic.evaluator.expressions;
 import io.github.jamsesso.jsonlogic.evaluator.JsonLogicEvaluationException;
 import io.github.jamsesso.jsonlogic.utils.DateOperations;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 public class DurationArithmeticExpression implements PreEvaluatedArgumentsExpression {
-  public static final DurationArithmeticExpression DURATION_BETWEEN = new DurationArithmeticExpression("duration_between");
+  public static final DurationArithmeticExpression DURATION_OF = new DurationArithmeticExpression("duration.of");
+  public static final DurationArithmeticExpression DURATION_BETWEEN = new DurationArithmeticExpression("duration.between");
+  public static final DurationArithmeticExpression DURATION_AS = new DurationArithmeticExpression("duration.as");
 
   private final String key;
 
@@ -33,16 +38,47 @@ public class DurationArithmeticExpression implements PreEvaluatedArgumentsExpres
 
     /*
      * --- Supported Operations ---
+     * DURATION_OF ("duration_of")
+     *    1. [intervalToAdd, intervalUnit]
      * DURATION_BETWEEN ("duration_between")
      *    1. [Date, Date]
      *
-     * NOTE: Return type is string representation of the duration
+     * RETURNS: Duration as String
+     *
+     * DURATION_AS
+     *    1. [Duration, intervalUnit]
+     *
+     * RETURNS: interval as NUMBER (BigDecimal)
      */
 
     try {
+      if (Objects.equals(key, "duration.between")) {
         OffsetDateTime start = DateOperations.fromDateString((String) arguments.get(0));
         OffsetDateTime end = DateOperations.fromDateString((String) arguments.get(1));
         return Duration.between(start, end).toString();
+      } else if (Objects.equals(key, "duration.of")) {
+        BigDecimal intervalToAdd = (BigDecimal) arguments.get(0);
+        ChronoUnit intervalUnit = ChronoUnit.valueOf((String) arguments.get(1));
+        return Duration.of(Long.parseLong(intervalToAdd.toString()), intervalUnit).toString();
+      } else {
+//        key == duration.as
+        Duration duration = Duration.parse((String) arguments.get(0));
+        ChronoUnit intervalUnit = ChronoUnit.valueOf((String) arguments.get(1));
+        switch (intervalUnit) {
+          case MILLIS:
+            return BigDecimal.valueOf(duration.toMillis());
+          case SECONDS:
+            return BigDecimal.valueOf(duration.toSeconds());
+          case MINUTES:
+            return BigDecimal.valueOf(duration.toMinutes());
+          case HOURS:
+            return BigDecimal.valueOf(duration.toHours());
+          case DAYS:
+            return BigDecimal.valueOf(duration.toDays());
+          default:
+            return null;
+        }
+      }
     } catch (Exception e) {
       return null;
     }

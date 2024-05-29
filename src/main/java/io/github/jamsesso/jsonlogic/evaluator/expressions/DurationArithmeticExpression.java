@@ -1,6 +1,7 @@
 package io.github.jamsesso.jsonlogic.evaluator.expressions;
 
 import io.github.jamsesso.jsonlogic.evaluator.JsonLogicEvaluationException;
+import io.github.jamsesso.jsonlogic.utils.BigDecimalOperations;
 import io.github.jamsesso.jsonlogic.utils.DateOperations;
 
 import java.math.BigDecimal;
@@ -59,9 +60,13 @@ public class DurationArithmeticExpression implements PreEvaluatedArgumentsExpres
       } else if (Objects.equals(key, "duration.of")) {
         BigDecimal intervalToAdd;
         if (arguments.get(0) instanceof Number) {
-          intervalToAdd = (BigDecimal) arguments.get(0);
+          intervalToAdd = BigDecimalOperations.fromNumber((Number) arguments.get(0));
         } else {
-          intervalToAdd = new BigDecimal((String) arguments.get(0));
+          String intervalToAddString = (String) arguments.get(0);
+          if (intervalToAddString.trim().isEmpty()) {
+            intervalToAddString = "0";
+          }
+          intervalToAdd = new BigDecimal(intervalToAddString);
         }
         ChronoUnit intervalUnit = ChronoUnit.valueOf((String) arguments.get(1));
         return Duration.of(Long.parseLong(intervalToAdd.toString()), intervalUnit).toString();

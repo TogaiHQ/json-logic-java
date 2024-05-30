@@ -1,2 +1,5 @@
 jdk:
-  - openjdk17.0.11 2024-04-16 LTS
+  - openjdk17
+before_install:
+  - sdk install 17.0.11 2024-04-16 LTS
+  - sdk use 17.0.11 2024-04-16 LTS

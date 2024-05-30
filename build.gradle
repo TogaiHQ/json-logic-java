@@ -1,13 +1,38 @@
-plugins {
-  id "java-library"
-  id "maven-publish"
-}
-
 group "io.github.jamsesso"
 version "1.0.8-SNAPSHOT"
 
+apply plugin: 'maven-publish'
+apply plugin: 'java-library'
+
 repositories {
+  mavenLocal()
   mavenCentral()
+}
+
+afterEvaluate {
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+        from components.java
+
+        version = "1.0.8-SNAPSHOT"
+        group = "io.github.jamsesso"
+        artifactId = "json-logic-java"
+      }
+    }
+  }
+}
+
+tasks.register('cleanMavenLocal') {
+  //From: https://stackoverflow.com/questions/36507115/is-there-a-simple-way-to-remove-one-dependency-from-the-local-gradle-cache
+  doLast {
+    println 'Deleting: ' + "${System.properties['user.home']}/.m2/repository/io/github/jamsesso"
+    new File("${System.properties['user.home']}/.m2/repository/io/github/jamsesso").deleteDir()
+  }
+}
+
+tasks.named('publishToMavenLocal').configure {
+  dependsOn tasks.named('cleanMavenLocal')
 }
 
 dependencies {

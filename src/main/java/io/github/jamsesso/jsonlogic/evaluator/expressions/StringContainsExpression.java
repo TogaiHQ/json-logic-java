@@ -26,13 +26,19 @@ public class StringContainsExpression implements PreEvaluatedArgumentsExpression
             throw new JsonLogicEvaluationException("contains operator requires 2 arguments");
         }
 
-        try {
-//            Using String.valueOf() to supported input arguments of any type
-            String argument = String.valueOf(arguments.get(0));
-            String charSequence = String.valueOf(arguments.get(1));
+        Object argument = arguments.get(0);
+        Object charSequence = arguments.get(1);
 
-//            Return type is boolean
-            return argument.contains(charSequence);
+        if (argument == null || charSequence == null) {
+            return null;
+        }
+
+        try {
+            /**
+             * Using String.valueOf() to supported input arguments of any type
+             * Return type is boolean
+             */
+            return String.valueOf(argument).contains(String.valueOf(charSequence));
         } catch (Exception e) {
             return null;
         }

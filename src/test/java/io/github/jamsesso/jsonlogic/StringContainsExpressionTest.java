@@ -60,7 +60,7 @@ public class StringContainsExpressionTest {
     @Test
     public void stringNullContains() throws JsonLogicException {
         assertEquals(
-                true,
+                null,
                 jsonLogic.apply("{\"contains\": [\"null checks\", " + null + "]}", null)
         );
     }
@@ -68,7 +68,7 @@ public class StringContainsExpressionTest {
     @Test
     public void nullNullContains() throws JsonLogicException {
         assertEquals(
-                true,
+                null,
                 jsonLogic.apply("{\"contains\": [" + null + ", " + null + "]}", null)
         );
     }
@@ -76,7 +76,7 @@ public class StringContainsExpressionTest {
     @Test
     public void nullStringContains() throws JsonLogicException {
         assertEquals(
-                true,
+                null,
                 jsonLogic.apply("{\"contains\": [" + null + ", \"ul\"]}", null)
         );
     }

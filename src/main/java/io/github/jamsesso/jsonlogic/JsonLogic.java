@@ -64,6 +64,7 @@ public final class JsonLogic {
     addOperation(DurationArithmeticExpression.DURATION_OF);
     addOperation(DurationArithmeticExpression.DURATION_BETWEEN);
     addOperation(DurationArithmeticExpression.DURATION_AS);
+    addOperation(StringContainsExpression.INSTANCE);
   }
 
   public JsonLogic addOperation(String name, Function<Object[], Object> function) {
